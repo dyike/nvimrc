@@ -3,13 +3,13 @@
 ### 0x00 前期安装
 前期需要安装的工具, 最新的`neovim`, `Packer`, `ctags`, `ripgrep` ... 
 * Packer 插件管理工具的安装
-`
+```
 git clone --depth 1 https://github.com/wbthomason/packer.nvim\\n ~/.local/share/nvim/site/pack/packer/start/packer.nvim
-`
+```
 * ripgrep 是`fuzzy finder`依赖
 
 ### 0x01 快捷键映射
-<leader> = ','
+`<leader>` = ','
 i = 插入(编辑)模式
 n = 普通模式
 v = 可视模式
