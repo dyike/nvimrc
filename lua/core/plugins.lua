@@ -5,6 +5,7 @@ return require('packer').startup(function()
     use 'wbthomason/packer.nvim'
     -- 主题
     use 'fioncat/vim-oceanicnext'
+    use 'Mofiqul/vscode.nvim'
     -- 导航栏
     use 'preservim/nerdtree'
     -- 导航栏显示git情况
