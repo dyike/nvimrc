@@ -1,6 +1,6 @@
 local _M = {}
 
-local c = require("vscode.colors")
+local c = require("vscode.colors").get_colors()
 
 function _M.config()
     require('vscode').setup({
@@ -15,6 +15,7 @@ function _M.config()
             vscLineNumber = '#FFCC33',
         },
     })
+    require('vscode').load()
 end
 
 return _M
