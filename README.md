@@ -37,7 +37,7 @@ v = 可视模式
 
 * `core/base.lua` 常规配置，被`init.lua`调用
 * `core/plugins.lua` neovim安装的插件管理，使用Lazy管理插件
-* `core/theam.lua`和`core/gui.lua` 配置的主题和gui相关
+* `core/theme.lua`和`core/gui.lua` 配置的主题和gui相关
 * `configs/autocomplete.lua` 自动补齐配置
 * `configs/lsp_config.lua` goimport和gopls相关的使用配置, 以及C/C++，Python的LSP配置
 * `configs/go_test.lua` 执行Go Test相关的快速配置
