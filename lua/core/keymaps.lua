@@ -1,5 +1,3 @@
-vim.g.mapleader = ','
-
 function map(mode, lhs, rhs, opts)
     local options = { noremap = true }
     if opts then
@@ -31,9 +29,6 @@ map('n', '<leader>gdf', ':Gdiffsplit<CR>')
 map('n', '<leader>w-', ':sv<CR>')
 map('n', "<leader>w\\", ":vs<CR>")
 
--- FZF search
--- map('n', '<C-s>', ':Files<CR>')
--- map('n', '<C-g>', ':Rg<CR>')
-
 -- vim-go
--- map('n', 'gr', '<Plug>(go-referrers)')
+map('n', 'gr', '<Plug>(go-referrers)')
+map('n', '<leader>gt', '<cmd>lua require("configs.go_test").run_test()<CR>')

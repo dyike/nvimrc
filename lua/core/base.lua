@@ -2,6 +2,8 @@
 vim.cmd('syntax on')
 vim.cmd('set termguicolors')
 vim.cmd('filetype plugin indent on')
+-- mapleader
+vim.g.mapleader = ','
 -- utf8
 vim.g.encoding = "UTF-8"
 vim.o.fileencoding = "utf-8"
@@ -70,11 +72,6 @@ vim.g.ale_cpp_gcc_options = '-Wall -O2 -std=c++14'
 vim.g.ale_c_cppcheck_options = ''
 vim.g.ale_cpp_cppcheck_options = ''
 
-
-require('core.gui')
-require('core.plugins')
-require('core.keymaps')
-
 -- disable some useless standard plugins to save startup time
 -- these features have been better covered by plugins/
 vim.g.loaded_matchparen        = 1
@@ -92,18 +89,19 @@ vim.g.loaded_netrwPlugin       = 1
 vim.g.loaded_tutor_mode_plugin = 1
 vim.g.loaded_remote_plugins    = 1
 
+require('core.lazy')
+require('core.gui')
+require('core.keymaps')
 require('core.theme')
 require('configs.vscode').config()
 
--- languages
+-- treesitter
 require('configs.treesitter').config()
--- git
-require('configs.git').config()
 -- cmp
 require('configs.autocomplete').config()
 -- search
 require('configs.search').config()
 -- lsp golang
-require('configs.lsp_golang')
+require('configs.lsp_config')
 -- lsp rust
 require('configs.lsp_rust')

@@ -3,4 +3,3 @@
 
 -- vscode theme
 vim.cmd("colorscheme vscode")
-

@@ -3,7 +3,32 @@ function M.config()
 	-- nvim-treesitter config
 	require 'nvim-treesitter.configs'.setup {
 		-- ensure_installed = "maintained", -- for installing all maintained parsers
-		ensure_installed = { "bash", "c", "cmake", "css", "dockerfile", "go", "gomod", "gowork", "hcl", "help", "html", "http", "javascript", "json", "lua", "make", "markdown", "python", "regex", "ruby", "rust", "toml", "vim", "yaml", "zig" }, -- for installing specific parsers
+		ensure_installed = { 
+			"bash",
+			"c",
+			"cmake",
+			"css",
+			"dockerfile",
+			"go",
+			"gomod",
+			"gowork",
+			"hcl",
+			"html",
+			"http",
+			"javascript",
+			"json",
+			"lua",
+			"make",
+			"markdown",
+			"python",
+			"regex",
+			"ruby",
+			"rust",
+			"toml",
+			"vim",
+			"yaml",
+			"zig",
+		}, -- for installing specific parsers
 		highlight = {
 			enable = true,
 		},
