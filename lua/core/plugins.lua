@@ -41,8 +41,9 @@ return {
     -- search
     {
         'nvim-telescope/telescope.nvim',
-        requires = {{'nvim-lua/popup.nvim'}, {'nvim-lua/plenary.nvim'}},
-        cmd = 'Telescope',
+        dependencies = {
+            'nvim-lua/plenary.nvim'
+        },
     },
 
     { 'tpope/vim-vinegar' },
