@@ -21,10 +21,10 @@ vim.o.updatetime     = 100
 vim.o.autowrite      = true
 
 -- 禁用mouse
-vim.o.mouse = false
+vim.o.mouse = ''
 
 -- paste toggle
-vim.o.pastetoggle = '<F5>'
+-- vim.o.pastetoggle = '<F5>'
 
 -- tabs
 -- 新行对齐当前行
