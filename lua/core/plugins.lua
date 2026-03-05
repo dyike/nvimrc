@@ -35,7 +35,20 @@ return {
             virtual_text_column = 1,  -- virtual text start column, check Start virtual text at column section for more options
         },
     },
-    { 'airblade/vim-gitgutter' },
+    { 'tpope/vim-fugitive' },
+    {
+        'lewis6991/gitsigns.nvim',
+        opts = {
+            signs = {
+                add          = { text = '+' },
+                change       = { text = '~' },
+                delete       = { text = '_' },
+                topdelete    = { text = '‾' },
+                changedelete = { text = '~' },
+            },
+            update_debounce = 100,
+        },
+    },
 
     -- 补全
     { 'hrsh7th/nvim-cmp' },
