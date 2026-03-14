@@ -65,7 +65,11 @@ return {
     { 'nvim-treesitter/nvim-treesitter' },
 
     -- Rust
-    { 'simrat39/rust-tools.nvim' },
+    {
+        'mrcjkb/rustaceanvim',
+        version = '^5',
+        lazy = false,
+    },
 
     -- search
     {

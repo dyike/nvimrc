@@ -1,10 +1,5 @@
-local nvim_lsp = require('lspconfig')
-local util = require("lspconfig/util")
-
-
 local capabilities = vim.lsp.protocol.make_client_capabilities()
 capabilities.textDocument.completion.completionItem.snippetSupport = true
--- capabilities = require('cmp_nvim_lsp').update_capabilities(capabilities)
 
 local on_attach = function(client, bufnr)
     local function buf_set_keymap(...) vim.api.nvim_buf_set_keymap(bufnr, ...) end
@@ -38,14 +33,15 @@ local on_attach = function(client, bufnr)
     buf_set_keymap('n', '<space>rn', '<cmd>lua vim.lsp.buf.rename()<CR>', opts)
     -- 列出所有语法错误列表
     buf_set_keymap('n', '<space>q', '<cmd>lua vim.diagnostic.setloclist()<CR>', opts)
-
 end
 
-
-nvim_lsp.gopls.setup{
+-- gopls
+vim.lsp.config('gopls', {
     cmd = { "gopls", "serve" },
     filetypes = { "go", "gomod", "gowork", "gotmpl" },
-    root_dir = util.root_pattern("go.work", "go.mod", ".git"),
+    root_dir = function(bufnr)
+        return vim.fs.root(bufnr, { "go.work", "go.mod", ".git" })
+    end,
     settings = {
         gopls = {
             experimentalPostfixCompletions = true,
@@ -59,35 +55,36 @@ nvim_lsp.gopls.setup{
             usePlaceholders = true,
         },
     },
-    -- flags = {
-    --     debounce_text_changes = 150,
-    -- },
+    capabilities = capabilities,
     on_attach = on_attach,
-}
+})
 
 -- clang
-nvim_lsp.clangd.setup({
+vim.lsp.config('clangd', {
     capabilities = capabilities,
-    on_attach = on_attach
+    on_attach = on_attach,
 })
 
 -- bash
-nvim_lsp.bashls.setup({
+vim.lsp.config('bashls', {
     capabilities = capabilities,
-    on_attach = on_attach
+    on_attach = on_attach,
 })
 
 -- python
-nvim_lsp.pyright.setup({
+vim.lsp.config('pyright', {
     capabilities = capabilities,
-    on_attach = on_attach
+    on_attach = on_attach,
 })
 
 -- rust
--- nvim_lsp.rust_analyzer.setup({
+-- vim.lsp.config('rust_analyzer', {
 --     capabilities = capabilities,
---     on_attach = on_attach
+--     on_attach = on_attach,
 -- })
+
+vim.lsp.enable({ 'gopls', 'clangd', 'bashls', 'pyright' })
+
 
 function goimports(timeout_ms)
     local params = vim.lsp.util.make_range_params()
@@ -108,4 +105,3 @@ function goimports(timeout_ms)
         end
     end
 end
-

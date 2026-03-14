@@ -1,8 +1,5 @@
-local opts = {
-    -- rust-tools options
+vim.g.rustaceanvim = {
     tools = {
-        autoSetHints = true,
-        RustHoverAction = true,
         inlay_hints = {
             show_parameter_hints = true,
             parameter_hints_prefix = "",
@@ -20,18 +17,15 @@ local opts = {
                     allFeatures = true
                 },
                 checkOnSave = {
-                    -- default: `cargo check`
                     command = "clippy"
                 },
-            },
-            inlayHints = {
-                lifetimeElisionHints = {
-                    enable = true,
-                    useParameterNames = true
+                inlayHints = {
+                    lifetimeElisionHints = {
+                        enable = true,
+                        useParameterNames = true
+                    },
                 },
             },
         }
     },
 }
-
-require('rust-tools').setup(opts)
