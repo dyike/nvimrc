@@ -39,8 +39,9 @@ end
 vim.lsp.config('gopls', {
     cmd = { "gopls", "serve" },
     filetypes = { "go", "gomod", "gowork", "gotmpl" },
-    root_dir = function(bufnr)
-        return vim.fs.root(bufnr, { "go.work", "go.mod", ".git" })
+    -- Neovim 0.11: root_dir 是异步回调，必须调用 on_dir(dir)，return 会被忽略
+    root_dir = function(bufnr, on_dir)
+        on_dir(vim.fs.root(bufnr, { "go.work", "go.mod", ".git" }))
     end,
     settings = {
         gopls = {
