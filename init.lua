@@ -3,8 +3,8 @@ require('core.base')
 vim.api.nvim_exec([[
     augroup MyAutocmd
         autocmd!
-        autocmd BufWritePre *.go lua vim.lsp.buf.format({async=false})
+        autocmd BufWritePre *.go lua if #vim.lsp.get_clients({bufnr=0}) > 0 then vim.lsp.buf.format({async=false}) end
         autocmd BufWritePre *.go lua goimports()
-        autocmd FileType makrdown setlocal spell
+        autocmd FileType markdown setlocal spell
     augroup END
 ]], false)

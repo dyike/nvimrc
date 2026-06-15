@@ -87,20 +87,23 @@ vim.lsp.enable({ 'gopls', 'clangd', 'bashls', 'pyright' })
 
 
 function goimports(timeout_ms)
-    local params = vim.lsp.util.make_range_params()
+    -- gopls 没 attach 就直接跳过，避免 Neovim 0.11 下的报错
+    local clients = vim.lsp.get_clients({ bufnr = 0, name = "gopls" })
+    if #clients == 0 then return end
+    local client = clients[1]
+
+    -- Neovim 0.11: make_range_params 需要 (window, offset_encoding)
+    local params = vim.lsp.util.make_range_params(0, client.offset_encoding)
     params.context = { only = { "source.organizeImports" } }
 
-    -- Add encoding specification
-    vim.bo.fileencoding = 'utf-8'
-
-    local result = vim.lsp.buf_request_sync(0, "textDocument/codeAction", params, timeout_ms)
+    local result = vim.lsp.buf_request_sync(0, "textDocument/codeAction", params, timeout_ms or 1000)
     if not result or next(result) == nil then return end
     for _, res in pairs(result) do
         for _, r in pairs(res.result or {}) do
             if r.edit then
-                vim.lsp.util.apply_workspace_edit(r.edit, "utf-8")
-            else
-                vim.lsp.buf.execute_command(r.command)
+                vim.lsp.util.apply_workspace_edit(r.edit, client.offset_encoding)
+            elseif r.command then
+                client:exec_cmd(r.command)
             end
         end
     end
