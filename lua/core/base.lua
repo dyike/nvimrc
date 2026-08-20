@@ -101,7 +101,3 @@ require('configs.treesitter').config()
 require('configs.autocomplete').config()
 -- search
 require('configs.search').config()
--- lsp golang
-require('configs.lsp_config')
--- lsp rust
-require('configs.lsp_rust')

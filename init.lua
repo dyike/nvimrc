@@ -1,10 +1,10 @@
 require('core.base')
 
-vim.api.nvim_exec([[
-    augroup MyAutocmd
-        autocmd!
-        autocmd BufWritePre *.go lua vim.lsp.buf.format({async=false})
-        autocmd BufWritePre *.go lua goimports()
-        autocmd FileType makrdown setlocal spell
-    augroup END
-]], false)
+local group = vim.api.nvim_create_augroup('MyAutocmd', { clear = true })
+vim.api.nvim_create_autocmd('FileType', {
+    group = group,
+    pattern = 'markdown',
+    callback = function()
+        vim.opt_local.spell = true
+    end,
+})

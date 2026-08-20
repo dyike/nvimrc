@@ -1,10 +1,4 @@
-local nvim_lsp = require('lspconfig')
-local util = require("lspconfig/util")
-
-
-local capabilities = vim.lsp.protocol.make_client_capabilities()
-capabilities.textDocument.completion.completionItem.snippetSupport = true
--- capabilities = require('cmp_nvim_lsp').update_capabilities(capabilities)
+local capabilities = require('cmp_nvim_lsp').default_capabilities()
 
 local on_attach = function(client, bufnr)
     local function buf_set_keymap(...) vim.api.nvim_buf_set_keymap(bufnr, ...) end
@@ -24,13 +18,13 @@ local on_attach = function(client, bufnr)
     buf_set_keymap('n', 'gr', '<cmd>lua vim.lsp.buf.references()<CR>', opts)
     -- 跳转到下一个/上一个语法错误
     buf_set_keymap('n', '<C-k>', '<cmd>lua vim.lsp.buf.signature_help()<CR>', opts)
-    buf_set_keymap('n', '[d', '<cmd>lua vim.lsp.diagnostic.goto_prev()<CR>', opts)
-    buf_set_keymap('n', ']d', '<cmd>lua vim.lsp.diagnostic.goto_next()<CR>', opts)
+    buf_set_keymap('n', '[d', '<cmd>lua vim.diagnostic.jump({ count = -1, float = true })<CR>', opts)
+    buf_set_keymap('n', ']d', '<cmd>lua vim.diagnostic.jump({ count = 1, float = true })<CR>', opts)
     -- 手工触发格式化
     buf_set_keymap('n', '<space>f', '<cmd>lua vim.lsp.buf.format({ async = true })<cr>', opts)
     buf_set_keymap('n', '<space>ca', '<Cmd>lua vim.lsp.buf.code_action()<CR>', opts)
     buf_set_keymap('n', '<space>D', '<cmd>lua vim.lsp.buf.type_definition()<CR>', opts)
-    buf_set_keymap('n', '<space>e', '<cmd>lua vim.lsp.diagnostic.show_line_diagnostics()<CR>', opts)
+    buf_set_keymap('n', '<space>e', '<cmd>lua vim.diagnostic.open_float()<CR>', opts)
     -- 修改当前符号的名字
     buf_set_keymap('n', '<space>wa', '<cmd>lua vim.lsp.buf.add_workspace_folder()<CR>', opts)
     buf_set_keymap('n', '<space>wr', '<cmd>lua vim.lsp.buf.remove_workspace_folder()<CR>', opts)
@@ -42,10 +36,17 @@ local on_attach = function(client, bufnr)
 end
 
 
-nvim_lsp.gopls.setup{
-    cmd = { "gopls", "serve" },
-    filetypes = { "go", "gomod", "gowork", "gotmpl" },
-    root_dir = util.root_pattern("go.work", "go.mod", ".git"),
+vim.lsp.config('*', {
+    capabilities = capabilities,
+    on_attach = on_attach,
+})
+
+vim.lsp.config('gopls', {
+    root_dir = function(bufnr, on_dir)
+        local filename = vim.api.nvim_buf_get_name(bufnr)
+        local root = vim.fs.root(filename, { 'go.work', 'go.mod', '.git' })
+        on_dir(root or vim.fs.dirname(filename))
+    end,
     settings = {
         gopls = {
             experimentalPostfixCompletions = true,
@@ -59,53 +60,50 @@ nvim_lsp.gopls.setup{
             usePlaceholders = true,
         },
     },
-    -- flags = {
-    --     debounce_text_changes = 150,
-    -- },
-    on_attach = on_attach,
-}
-
--- clang
-nvim_lsp.clangd.setup({
-    capabilities = capabilities,
-    on_attach = on_attach
 })
 
--- bash
-nvim_lsp.bashls.setup({
-    capabilities = capabilities,
-    on_attach = on_attach
-})
+vim.lsp.enable({ 'gopls', 'clangd', 'bashls', 'pyright' })
 
--- python
-nvim_lsp.pyright.setup({
-    capabilities = capabilities,
-    on_attach = on_attach
-})
-
--- rust
--- nvim_lsp.rust_analyzer.setup({
---     capabilities = capabilities,
---     on_attach = on_attach
--- })
-
-function goimports(timeout_ms)
-    local params = vim.lsp.util.make_range_params()
+local function organize_imports(client, bufnr, timeout_ms)
+    local params = vim.lsp.util.make_range_params(0, client.offset_encoding)
     params.context = { only = { "source.organizeImports" } }
 
-    -- Add encoding specification
-    vim.bo.fileencoding = 'utf-8'
-
-    local result = vim.lsp.buf_request_sync(0, "textDocument/codeAction", params, timeout_ms)
-    if not result or next(result) == nil then return end
-    for _, res in pairs(result) do
-        for _, r in pairs(res.result or {}) do
-            if r.edit then
-                vim.lsp.util.apply_workspace_edit(r.edit, "utf-8")
-            else
-                vim.lsp.buf.execute_command(r.command)
-            end
+    local response = client:request_sync('textDocument/codeAction', params, timeout_ms, bufnr)
+    for _, action in ipairs(response and response.result or {}) do
+        if action.edit then
+            vim.lsp.util.apply_workspace_edit(action.edit, client.offset_encoding)
+        end
+        local command = type(action.command) == 'table' and action.command
+            or type(action.command) == 'string' and action
+        if command then
+            client:exec_cmd(command, { bufnr = bufnr })
         end
     end
 end
 
+local go_format_group = vim.api.nvim_create_augroup('GoLspFormat', { clear = true })
+vim.api.nvim_create_autocmd('BufWritePre', {
+    group = go_format_group,
+    pattern = '*.go',
+    callback = function(args)
+        local clients = vim.lsp.get_clients({ bufnr = args.buf, name = 'gopls' })
+        local client = clients[1]
+        if not client then
+            return
+        end
+
+        if client:supports_method('textDocument/codeAction') then
+            organize_imports(client, args.buf, 1000)
+        end
+        if client:supports_method('textDocument/formatting') then
+            vim.lsp.buf.format({
+                bufnr = args.buf,
+                async = false,
+                timeout_ms = 2000,
+                filter = function(format_client)
+                    return format_client.id == client.id
+                end,
+            })
+        end
+    end,
+})

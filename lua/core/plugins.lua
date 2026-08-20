@@ -59,13 +59,17 @@ return {
     { 'hrsh7th/vim-vsnip' },
 
     { 'honza/vim-snippets' },
-    { 'neovim/nvim-lspconfig' },
+    {
+        'neovim/nvim-lspconfig',
+        dependencies = { 'hrsh7th/cmp-nvim-lsp' },
+        config = function()
+            require('configs.lsp_config')
+            require('configs.lsp_rust')
+        end,
+    },
 
     -- C/C++/Lua
     { 'nvim-treesitter/nvim-treesitter' },
-
-    -- Rust
-    { 'simrat39/rust-tools.nvim' },
 
     -- search
     {
