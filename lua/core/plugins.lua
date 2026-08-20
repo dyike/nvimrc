@@ -71,6 +71,16 @@ return {
     -- C/C++/Lua
     { 'nvim-treesitter/nvim-treesitter' },
 
+<<<<<<< HEAD
+=======
+    -- Rust
+    {
+        'mrcjkb/rustaceanvim',
+        version = '^5',
+        lazy = false,
+    },
+
+>>>>>>> 1f2ce0a1ef3622fc62e60f156103e8b60c83ade0
     -- search
     {
         'nvim-telescope/telescope.nvim',

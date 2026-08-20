@@ -1,4 +1,9 @@
+<<<<<<< HEAD
 local capabilities = require('cmp_nvim_lsp').default_capabilities()
+=======
+local capabilities = vim.lsp.protocol.make_client_capabilities()
+capabilities.textDocument.completion.completionItem.snippetSupport = true
+>>>>>>> 1f2ce0a1ef3622fc62e60f156103e8b60c83ade0
 
 local on_attach = function(client, bufnr)
     local function buf_set_keymap(...) vim.api.nvim_buf_set_keymap(bufnr, ...) end
@@ -32,9 +37,9 @@ local on_attach = function(client, bufnr)
     buf_set_keymap('n', '<space>rn', '<cmd>lua vim.lsp.buf.rename()<CR>', opts)
     -- 列出所有语法错误列表
     buf_set_keymap('n', '<space>q', '<cmd>lua vim.diagnostic.setloclist()<CR>', opts)
-
 end
 
+<<<<<<< HEAD
 
 vim.lsp.config('*', {
     capabilities = capabilities,
@@ -46,6 +51,15 @@ vim.lsp.config('gopls', {
         local filename = vim.api.nvim_buf_get_name(bufnr)
         local root = vim.fs.root(filename, { 'go.work', 'go.mod', '.git' })
         on_dir(root or vim.fs.dirname(filename))
+=======
+-- gopls
+vim.lsp.config('gopls', {
+    cmd = { "gopls", "serve" },
+    filetypes = { "go", "gomod", "gowork", "gotmpl" },
+    -- Neovim 0.11: root_dir 是异步回调，必须调用 on_dir(dir)，return 会被忽略
+    root_dir = function(bufnr, on_dir)
+        on_dir(vim.fs.root(bufnr, { "go.work", "go.mod", ".git" }))
+>>>>>>> 1f2ce0a1ef3622fc62e60f156103e8b60c83ade0
     end,
     settings = {
         gopls = {
@@ -60,6 +74,7 @@ vim.lsp.config('gopls', {
             usePlaceholders = true,
         },
     },
+<<<<<<< HEAD
 })
 
 vim.lsp.enable({ 'gopls', 'clangd', 'bashls', 'pyright' })
@@ -107,3 +122,58 @@ vim.api.nvim_create_autocmd('BufWritePre', {
         end
     end,
 })
+=======
+    capabilities = capabilities,
+    on_attach = on_attach,
+})
+
+-- clang
+vim.lsp.config('clangd', {
+    capabilities = capabilities,
+    on_attach = on_attach,
+})
+
+-- bash
+vim.lsp.config('bashls', {
+    capabilities = capabilities,
+    on_attach = on_attach,
+})
+
+-- python
+vim.lsp.config('pyright', {
+    capabilities = capabilities,
+    on_attach = on_attach,
+})
+
+-- rust
+-- vim.lsp.config('rust_analyzer', {
+--     capabilities = capabilities,
+--     on_attach = on_attach,
+-- })
+
+vim.lsp.enable({ 'gopls', 'clangd', 'bashls', 'pyright' })
+
+
+function goimports(timeout_ms)
+    -- gopls 没 attach 就直接跳过，避免 Neovim 0.11 下的报错
+    local clients = vim.lsp.get_clients({ bufnr = 0, name = "gopls" })
+    if #clients == 0 then return end
+    local client = clients[1]
+
+    -- Neovim 0.11: make_range_params 需要 (window, offset_encoding)
+    local params = vim.lsp.util.make_range_params(0, client.offset_encoding)
+    params.context = { only = { "source.organizeImports" } }
+
+    local result = vim.lsp.buf_request_sync(0, "textDocument/codeAction", params, timeout_ms or 1000)
+    if not result or next(result) == nil then return end
+    for _, res in pairs(result) do
+        for _, r in pairs(res.result or {}) do
+            if r.edit then
+                vim.lsp.util.apply_workspace_edit(r.edit, client.offset_encoding)
+            elseif r.command then
+                client:exec_cmd(r.command)
+            end
+        end
+    end
+end
+>>>>>>> 1f2ce0a1ef3622fc62e60f156103e8b60c83ade0
