@@ -69,7 +69,11 @@ return {
     },
 
     -- C/C++/Lua
-    { 'nvim-treesitter/nvim-treesitter' },
+    {
+        'nvim-treesitter/nvim-treesitter',
+        branch = 'master', -- legacy API; compatible with Neovim 0.11
+        build = ':TSUpdate',
+    },
 
     -- search
     {
