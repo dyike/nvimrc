@@ -45,6 +45,11 @@ vim.lsp.config('gopls', {
         local root = vim.fs.root(filename, { 'go.work', 'go.mod', '.git' })
         on_dir(root or vim.fs.dirname(filename))
     end,
+    -- 改 go.mod 后 gopls 会按目录重新注册大量文件监听 glob，
+    -- nvim 在主线程逐个编译匹配会卡住，关掉动态注册，gopls 自己会感知文件变更
+    capabilities = vim.tbl_deep_extend('force', capabilities, {
+        workspace = { didChangeWatchedFiles = { dynamicRegistration = false } },
+    }),
     settings = {
         gopls = {
             experimentalPostfixCompletions = true,
