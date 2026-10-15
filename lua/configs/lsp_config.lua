@@ -52,6 +52,8 @@ vim.lsp.config('gopls', {
     }),
     settings = {
         gopls = {
+            -- 默认 Prompt 会在保存 go.mod 后询问是否扫描漏洞，:wqa 退出时也会阻塞等输入。
+            vulncheck = 'Off',
             experimentalPostfixCompletions = true,
             analyses = {
                 unusedparams = true,
