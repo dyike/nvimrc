@@ -7,6 +7,10 @@ vim.g.mapleader = ','
 -- utf8
 vim.g.encoding = "UTF-8"
 vim.o.fileencoding = "utf-8"
+-- 使用当前用户可写的 swap 目录，避免旧的 root 所有目录导致 E303。
+local swap_dir = vim.fn.stdpath('state') .. '/swapfiles'
+vim.fn.mkdir(swap_dir, 'p')
+vim.opt.directory = swap_dir .. '//'
 -- line number
 vim.o.number         = true
 vim.o.relativenumber = false
@@ -88,6 +92,9 @@ vim.g.loaded_netrw             = 1
 vim.g.loaded_netrwPlugin       = 1
 vim.g.loaded_tutor_mode_plugin = 1
 vim.g.loaded_remote_plugins    = 1
+
+-- NERDTree 在 VimEnter 清理 netrw 的 FileExplorer 组；禁用 netrw 后先建空组，避免 E216。
+vim.api.nvim_create_augroup('FileExplorer', { clear = false })
 
 require('core.lazy')
 require('core.gui')
